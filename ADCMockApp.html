@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ADC Written Exam – MCQ Practice</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -28,6 +29,164 @@
     --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
     --radius: 12px;
     --radius-sm: 8px;
+  }
+
+
+  /* ── 3D EFFECTS ── */
+
+  /* Upload screen canvas bg */
+  #three-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  #upload-screen { position: relative; z-index: 1; }
+  .brand, .upload-card { position: relative; z-index: 2; }
+
+  /* Upload card 3D float */
+  .upload-card {
+    transform-style: preserve-3d;
+    transform: perspective(800px) rotateX(0deg) rotateY(0deg) translateZ(0px);
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), border-color 0.2s, background 0.2s;
+    will-change: transform;
+  }
+
+  /* Question card 3D tilt on hover */
+  .question-card {
+    transform-style: preserve-3d;
+    transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.2s ease;
+    will-change: transform;
+  }
+
+  .question-card.entering {
+    animation: cardCurveIn 0.45s cubic-bezier(0.34, 1.3, 0.64, 1) forwards;
+  }
+
+  @keyframes cardCurveIn {
+    0%   { transform: perspective(1000px) rotateY(-22deg) rotateX(6deg) translateZ(-40px) translateX(40px); opacity: 0; }
+    60%  { transform: perspective(1000px) rotateY(3deg)   rotateX(-1deg) translateZ(6px)  translateX(-4px); opacity: 1; }
+    100% { transform: perspective(1000px) rotateY(0deg)   rotateX(0deg)  translateZ(0px)  translateX(0px); opacity: 1; }
+  }
+
+  .scenario-box {
+    animation: scenarioCurveIn 0.5s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+  }
+
+  @keyframes scenarioCurveIn {
+    0%   { transform: perspective(800px) rotateX(-15deg) translateY(-20px); opacity: 0; }
+    100% { transform: perspective(800px) rotateX(0deg)   translateY(0px);   opacity: 1; }
+  }
+
+  /* Option 3D press effect */
+  .option {
+    transform-style: preserve-3d;
+    transform: perspective(600px) translateZ(0px);
+    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    will-change: transform;
+  }
+
+  .option:hover {
+    transform: perspective(600px) translateZ(8px) scale(1.01);
+    box-shadow: 0 8px 24px rgba(45,90,142,0.18);
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  .option.selected {
+    transform: perspective(600px) translateZ(10px) scale(1.015);
+    box-shadow: 0 10px 28px rgba(45,90,142,0.22);
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  .option:active {
+    transform: perspective(600px) translateZ(2px) scale(0.985);
+    transition: transform 0.08s ease;
+  }
+
+  /* Nav buttons 3D press */
+  .nav-btn {
+    transform: perspective(400px) translateZ(0px);
+    transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    will-change: transform;
+  }
+
+  .nav-btn:hover:not(:disabled) {
+    transform: perspective(400px) translateZ(6px);
+    box-shadow: 0 6px 18px rgba(45,90,142,0.2);
+    border-color: var(--accent); color: var(--accent); background: var(--accent-light);
+  }
+
+  .nav-btn.primary:hover:not(:disabled) {
+    transform: perspective(400px) translateZ(6px);
+    box-shadow: 0 6px 18px rgba(45,90,142,0.35);
+    background: var(--accent-dark); border-color: var(--accent-dark); color: white;
+  }
+
+  .nav-btn:active:not(:disabled) {
+    transform: perspective(400px) translateZ(-2px);
+    transition: transform 0.06s ease;
+  }
+
+  /* Finish button 3D */
+  .finish-btn {
+    transform: perspective(400px) translateZ(0px);
+    transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), background 0.2s, box-shadow 0.15s;
+  }
+
+  .finish-btn:hover {
+    transform: perspective(400px) translateZ(5px);
+    box-shadow: 0 5px 16px rgba(45,90,142,0.3);
+    background: var(--accent-dark);
+  }
+
+  .finish-btn:active {
+    transform: perspective(400px) translateZ(-1px);
+    transition: transform 0.06s ease;
+  }
+
+  /* Q-dot 3D pop */
+  .q-dot {
+    transform: perspective(300px) translateZ(0px);
+    transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), border-color 0.15s, background 0.15s, color 0.15s;
+  }
+
+  .q-dot:hover {
+    transform: perspective(300px) translateZ(5px);
+    border-color: var(--accent); color: var(--accent);
+  }
+
+  .q-dot.answered {
+    transform: perspective(300px) translateZ(3px);
+  }
+
+  .q-dot.current {
+    transform: perspective(300px) translateZ(7px);
+  }
+
+  /* Score ring 3D entrance */
+  .score-ring {
+    transform-style: preserve-3d;
+    animation: ringEntrance 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  }
+
+  @keyframes ringEntrance {
+    from { transform: perspective(600px) rotateX(40deg) scale(0.7); opacity: 0; }
+    to   { transform: perspective(600px) rotateX(0deg)  scale(1);   opacity: 1; }
+  }
+
+  /* Result items 3D slide-in */
+  .result-item {
+    animation: slideUp3d 0.35s cubic-bezier(0.34,1.2,0.64,1) both;
+  }
+
+  @keyframes slideUp3d {
+    from { transform: perspective(600px) translateZ(-30px) translateY(20px); opacity: 0; }
+    to   { transform: perspective(600px) translateZ(0px)   translateY(0px);  opacity: 1; }
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -337,12 +496,7 @@
     background: var(--surface);
   }
 
-  .option:hover { border-color: var(--accent); background: var(--accent-light); }
-
-  .option.selected {
-    border-color: var(--accent);
-    background: var(--accent-light);
-  }
+  /* option hover/selected handled by 3D block above */
 
   .option-letter {
     width: 28px; height: 28px;
@@ -775,6 +929,7 @@
 </head>
 <body>
 
+<canvas id="three-canvas"></canvas>
 <!-- ── UPLOAD SCREEN ── -->
 <div id="upload-screen">
   <div class="brand">
@@ -1040,6 +1195,14 @@ function renderQuestion(idx) {
   document.getElementById('next-btn').onclick = idx === questions.length - 1 ? openFinishModal : () => navigate(1);
 
   updateGrid();
+  // Trigger curve entrance animation
+  const card = document.querySelector('.question-card');
+  if (card) {
+    card.classList.remove('entering');
+    void card.offsetWidth; // force reflow
+    card.classList.add('entering');
+    card.addEventListener('animationend', () => card.classList.remove('entering'), { once: true });
+  }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1196,6 +1359,173 @@ function showToast(msg) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
 }
+
+// ── THREE.JS FLOWING CURVES BACKGROUND ──
+(function() {
+  const canvas = document.getElementById('three-canvas');
+  if (!canvas || typeof THREE === 'undefined') return;
+
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 200);
+  camera.position.set(0, 0, 22);
+
+  // Warm neutral lighting — lets black tubes catch subtle warm highlights
+  scene.add(new THREE.AmbientLight(0xf5f0e8, 0.5));
+  const keyLight = new THREE.PointLight(0xf0ece4, 3.5, 80);
+  keyLight.position.set(6, 8, 12);
+  scene.add(keyLight);
+  const fillLight = new THREE.PointLight(0xe8e0d4, 1.8, 60);
+  fillLight.position.set(-8, -4, 8);
+  scene.add(fillLight);
+
+  // ── 3 elegant closed loops ──
+  // Each loop is a closed CatmullRom that traces a gentle 3D lemniscate/orbit shape
+  const loops = [];
+
+  const loopDefs = [
+    { scale: 7.0, tilt: 0.18, color: 0x1a1714, emissive: 0x080706, radius: 0.13, speed: 0.0007, phase: 0 },
+    { scale: 5.2, tilt: 0.55, color: 0x3a3530, emissive: 0x181410, radius: 0.09, speed: 0.0011, phase: 2.1 },
+    { scale: 9.0, tilt: -0.3, color: 0x252018, emissive: 0x0e0c0a, radius: 0.07, speed: 0.0005, phase: 4.2 },
+  ];
+
+  function buildLoopPoints(def, t) {
+    const pts = [];
+    const N = 80;
+    for (let i = 0; i <= N; i++) {
+      const u = (i / N) * Math.PI * 2;
+      // Lemniscate-style loop in 3D
+      const x = def.scale * Math.sin(u);
+      const y = def.scale * 0.5 * Math.sin(u * 2) * Math.cos(def.tilt + t * 0.3);
+      const z = def.scale * 0.4 * Math.cos(u) * Math.sin(def.tilt + t * 0.2);
+      pts.push(new THREE.Vector3(x, y, z));
+    }
+    return pts;
+  }
+
+  loopDefs.forEach((def, i) => {
+    const pts = buildLoopPoints(def, 0);
+    const spline = new THREE.CatmullRomCurve3(pts, true, 'catmullrom', 0.3);
+    const geo = new THREE.TubeGeometry(spline, 300, def.radius, 8, true);
+    const mat = new THREE.MeshPhongMaterial({
+      color: def.color,
+      emissive: def.emissive,
+      transparent: true,
+      opacity: 0.55,
+      shininess: 160,
+      specular: 0xf0ece4,
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.rotation.z = (i / loopDefs.length) * Math.PI * 0.4;
+    scene.add(mesh);
+    loops.push({ mesh, spline, def, baseRotZ: mesh.rotation.z });
+  });
+
+  // Mouse parallax
+  let mx = 0, my = 0, tmx = 0, tmy = 0;
+  document.addEventListener('mousemove', e => {
+    tmx = (e.clientX / window.innerWidth  - 0.5) * 1.8;
+    tmy = (e.clientY / window.innerHeight - 0.5) * 1.2;
+  });
+  document.addEventListener('touchmove', e => {
+    tmx = (e.touches[0].clientX / window.innerWidth  - 0.5) * 1.8;
+    tmy = (e.touches[0].clientY / window.innerHeight - 0.5) * 1.2;
+  }, { passive: true });
+
+  function isUploadVisible() {
+    const el = document.getElementById('upload-screen');
+    return el && el.style.display !== 'none';
+  }
+  canvas.style.transition = 'opacity 1s ease';
+
+  let clock = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    clock += 0.008;
+
+    mx += (tmx - mx) * 0.035;
+    my += (tmy - my) * 0.035;
+
+    camera.position.x += (mx - camera.position.x) * 0.04;
+    camera.position.y += (-my * 0.6 - camera.position.y) * 0.04;
+    camera.lookAt(0, 0, 0);
+
+    // Animate each loop — morph the lemniscate over time
+    loops.forEach((l, i) => {
+      const t = clock + l.def.phase;
+
+      // Rebuild pts so the loop breathes/morphs
+      const newPts = [];
+      const N = 80;
+      for (let j = 0; j <= N; j++) {
+        const u = (j / N) * Math.PI * 2;
+        const breathe = 1 + 0.08 * Math.sin(clock * 1.1 + i * 1.3);
+        const x = l.def.scale * breathe * Math.sin(u);
+        const y = l.def.scale * 0.5 * breathe * Math.sin(u * 2) * Math.cos(l.def.tilt + t * 0.25);
+        const z = l.def.scale * 0.4 * Math.cos(u) * Math.sin(l.def.tilt + t * 0.18);
+        newPts.push(new THREE.Vector3(x, y, z));
+      }
+      l.spline.points = newPts;
+      l.spline.updateArcLengths();
+
+      const newGeo = new THREE.TubeGeometry(l.spline, 300, l.def.radius, 8, true);
+      l.mesh.geometry.dispose();
+      l.mesh.geometry = newGeo;
+
+      // Slow orbit rotation
+      l.mesh.rotation.y = clock * l.def.speed * 80;
+      l.mesh.rotation.x = Math.sin(clock * 0.15 + i) * 0.2;
+    });
+
+    keyLight.position.x  = Math.sin(clock * 0.28) * 9;
+    keyLight.position.y  = Math.cos(clock * 0.22) * 7;
+    fillLight.position.x = Math.cos(clock * 0.32) * 9;
+
+    canvas.style.opacity = isUploadVisible() ? '1' : '0';
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+})();
+
+// ── QUESTION CARD 3D TILT ──
+(function() {
+  function initTilt() {
+    const card = document.querySelector('.question-card');
+    if (!card) return;
+
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width  - 0.5;
+      const y = (e.clientY - r.top)  / r.height - 0.5;
+      card.style.transform = `perspective(1000px) rotateY(${x * 6}deg) rotateX(${-y * 4}deg) translateZ(4px)`;
+      card.style.boxShadow = `${-x*12}px ${y*12}px 32px rgba(45,90,142,0.15)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
+      card.style.boxShadow = '';
+    });
+  }
+
+  // Re-init tilt after each question render
+  const _orig = window.renderQuestion;
+  if (typeof _orig === 'function') {
+    window.renderQuestion = function(idx) {
+      _orig(idx);
+      setTimeout(initTilt, 50);
+    };
+  }
+})();
+
 </script>
 </body>
 </html>
