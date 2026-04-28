@@ -677,13 +677,99 @@
 
   .toast.show { opacity: 1; }
 
+  /* ── MOBILE SIDEBAR TOGGLE ── */
+  .sidebar-toggle {
+    display: none;
+    background: var(--accent-light);
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    border-radius: 7px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .sidebar-drawer {
+    display: contents;
+  }
+
   @media (max-width: 700px) {
+    /* header */
+    .exam-header { padding: 0 14px; height: 54px; }
+    .header-title { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+    .progress-text { font-size: 12px; }
+    .finish-btn { padding: 7px 12px; font-size: 12px; }
+    .sidebar-toggle { display: flex; }
+
+    /* layout: single column, sidebar becomes drawer */
     .exam-body { grid-template-columns: 1fr; }
-    .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); padding: 16px; }
-    .question-area { padding: 20px 16px; }
-    .question-card { padding: 20px; }
-    .nav-bar { flex-wrap: wrap; gap: 8px; }
-    .jump-wrapper { order: -1; width: 100%; }
+
+    .sidebar {
+      position: fixed;
+      top: 54px; left: 0; right: 0;
+      height: auto;
+      max-height: 55vh;
+      overflow-y: auto;
+      border-right: none;
+      border-bottom: 2px solid var(--border);
+      padding: 16px;
+      z-index: 90;
+      background: var(--surface);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+      transform: translateY(-110%);
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar.open {
+      transform: translateY(0);
+    }
+
+    /* question area full width */
+    .question-area {
+      padding: 16px 14px;
+      max-width: 100%;
+    }
+
+    .question-card { padding: 18px 16px; }
+
+    .q-text { font-size: 15px; }
+
+    .option { padding: 12px 14px; }
+    .option-text { font-size: 14px; }
+
+    /* nav bar stacks nicely */
+    .nav-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .jump-wrapper {
+      grid-column: 1 / -1;
+      justify-content: center;
+    }
+
+    #prev-btn { justify-content: center; }
+    #next-btn { justify-content: center; }
+
+    /* results */
+    .results-inner { padding: 0 4px; }
+    .result-top { padding: 14px 14px; gap: 10px; }
+    .result-q { font-size: 13.5px; }
+    .result-status { font-size: 11px; padding: 3px 8px; }
+    .result-detail.open { padding: 0 14px 16px; }
+    .result-opt { font-size: 13px; padding: 8px 10px; }
+
+    /* scenario box */
+    .scenario-box { padding: 14px 16px; }
+    .scenario-text { font-size: 14px; }
+
+    /* upload screen */
+    .upload-card { padding: 32px 20px; }
+    .brand h1 { font-size: 26px; }
   }
 </style>
 </head>
@@ -711,10 +797,13 @@
 <!-- ── EXAM SCREEN ── -->
 <div id="exam-screen">
   <header class="exam-header">
-    <div class="header-title" id="exam-title">ADC Practice Exam</div>
+    <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+      <button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()">☰ <span id="toggle-label">Questions</span></button>
+      <div class="header-title" id="exam-title">ADC Practice Exam</div>
+    </div>
     <div class="header-right">
       <span class="progress-text" id="progress-text"></span>
-      <button class="finish-btn" onclick="openFinishModal()">Finish Exam</button>
+      <button class="finish-btn" onclick="openFinishModal()">Finish</button>
     </div>
   </header>
 
@@ -881,7 +970,15 @@ function buildGrid() {
     dot.className = 'q-dot' + (q.scenarioText ? ' scenario-q' : '');
     dot.textContent = i + 1;
     dot.dataset.index = i;
-    dot.addEventListener('click', () => { currentIndex = i; renderQuestion(i); });
+    dot.addEventListener('click', () => {
+      currentIndex = i;
+      renderQuestion(i);
+      const sidebar = document.querySelector('.sidebar');
+      if (sidebar && sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+        document.getElementById('toggle-label').textContent = 'Questions';
+      }
+    });
     grid.appendChild(dot);
   });
 }
@@ -1072,6 +1169,25 @@ function resetApp() {
   document.getElementById('score-arc').style.transition = 'none';
   document.getElementById('score-arc').style.strokeDashoffset = '364';
 }
+
+// ── Sidebar toggle (mobile) ──
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const label = document.getElementById('toggle-label');
+  const isOpen = sidebar.classList.toggle('open');
+  label.textContent = isOpen ? 'Close' : 'Questions';
+}
+
+// Close sidebar when a question dot is tapped on mobile
+document.addEventListener('click', function(e) {
+  const sidebar = document.querySelector('.sidebar');
+  const toggle = document.getElementById('sidebar-toggle');
+  if (sidebar && sidebar.classList.contains('open') &&
+      !sidebar.contains(e.target) && !toggle.contains(e.target)) {
+    sidebar.classList.remove('open');
+    document.getElementById('toggle-label').textContent = 'Questions';
+  }
+});
 
 // ── Toast ──
 function showToast(msg) {
