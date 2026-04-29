@@ -5,30 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ADC Written Exam – MCQ Practice</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f5f2ec;
-    --surface: #ffffff;
-    --surface2: #f0ede6;
-    --border: #ddd8cf;
-    --text: #1a1714;
-    --text-muted: #7a746b;
-    --accent: #2d5a8e;
-    --accent-light: #e8f0f9;
-    --accent-dark: #1e3f63;
-    --correct: #2a7a4b;
-    --correct-bg: #eaf6ef;
-    --wrong: #c0392b;
-    --wrong-bg: #fdf0ef;
-    --answered: #2d5a8e;
-    --unanswered: #c9c3b8;
-    --scenario: #5a3e8e;
-    --scenario-bg: #f3f0fb;
-    --shadow: 0 2px 12px rgba(0,0,0,0.08);
-    --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
-    --radius: 12px;
-    --radius-sm: 8px;
+    /* ── Exam palette — dark clinical ── */
+    --bg: #0d1521;
+    --surface: #131e2e;
+    --surface2: #1a2638;
+    --border: rgba(255,255,255,0.09);
+    --text: #e8f0f8;
+    --text-muted: #6a85a4;
+    --accent: #4a9fd4;
+    --accent-light: rgba(74,159,212,0.12);
+    --accent-dark: #2d7ab0;
+    --correct: #34c47a;
+    --correct-bg: rgba(52,196,122,0.12);
+    --wrong: #f06070;
+    --wrong-bg: rgba(240,96,112,0.12);
+    --answered: #4a9fd4;
+    --unanswered: rgba(255,255,255,0.15);
+    --scenario: #9b7fe8;
+    --scenario-bg: rgba(155,127,232,0.1);
+    --shadow: 0 4px 20px rgba(0,0,0,0.35);
+    --shadow-lg: 0 12px 48px rgba(0,0,0,0.5);
+    --radius: 14px;
+    --radius-sm: 9px;
+    --glass: rgba(255,255,255,0.05);
+    --glass-border: rgba(255,255,255,0.1);
   }
 
 
@@ -43,8 +46,13 @@
     pointer-events: none;
   }
 
-  #upload-screen { position: relative; z-index: 1; }
-  .brand, .upload-card { position: relative; z-index: 2; }
+  /* Dark dentistry background only on upload screen */
+  body.on-upload {
+    background: #080f1e;
+  }
+
+  #upload-screen { position: relative; z-index: 2; }
+  .home-inner { position: relative; z-index: 3; }
 
   /* Upload card 3D float */
   .upload-card {
@@ -193,146 +201,309 @@
     line-height: 1.6;
   }
 
-  /* ── UPLOAD SCREEN ── */
+  /* Subtle dental grid overlay on exam body */
+  #exam-screen, #results-screen {
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(74,159,212,0.06) 0%, transparent 60%),
+      var(--bg);
+  }
+
+  /* ══════════════════════════════════
+     UPLOAD / HOME SCREEN — AWARD EDITION
+     ══════════════════════════════════ */
+
+  /* Dark overlay behind Three.js so text pops */
   #upload-screen {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px 20px;
+    padding: clamp(32px, 8vw, 60px) 20px;
+    position: relative;
+    overflow: hidden;
+    background: transparent;
   }
 
-  .brand {
-    text-align: center;
-    margin-bottom: 48px;
+  /* Radial glow behind card */
+  #upload-screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 60%, rgba(45,90,142,0.18) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 40% at 20% 20%, rgba(90,62,142,0.10) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 1;
   }
 
-  .brand-badge {
-    display: inline-block;
-    background: var(--accent);
-    color: white;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    padding: 4px 12px;
-    border-radius: 20px;
-    margin-bottom: 16px;
-  }
-
-  .brand h1 {
-    font-family: 'Lora', serif;
-    font-size: clamp(28px, 5vw, 42px);
-    font-weight: 600;
-    color: var(--text);
-    line-height: 1.2;
-  }
-
-  .brand p {
-    margin-top: 10px;
-    color: var(--text-muted);
-    font-size: 15px;
-    max-width: 400px;
-    margin-inline: auto;
-  }
-
-  .upload-card {
-    background: var(--surface);
-    border: 2px dashed var(--border);
-    border-radius: var(--radius);
-    padding: 48px 40px;
+  .home-inner {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     width: 100%;
-    max-width: 480px;
-    text-align: center;
-    transition: border-color 0.2s, background 0.2s, transform 0.15s;
-    box-shadow: var(--shadow);
+    max-width: 500px;
   }
 
-  .upload-card.drag-over {
-    border-color: var(--accent);
-    background: var(--accent-light);
-    transform: translateY(-2px);
+  /* ── Floating tooth SVG ── */
+  .tooth-icon {
+    width: 72px;
+    height: 72px;
+    margin-bottom: 28px;
+    animation: toothFloat 4s ease-in-out infinite, fadeUp 1s cubic-bezier(0.22,1,0.36,1) both;
+    filter: drop-shadow(0 8px 24px rgba(45,90,142,0.35));
   }
 
-  .upload-icon {
-    width: 56px; height: 56px;
-    background: var(--accent-light);
+  @keyframes toothFloat {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50%       { transform: translateY(-10px) rotate(2deg); }
+  }
+
+  /* ── Eyebrow tag ── */
+  .home-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'Inter', sans-serif;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(10px);
+    padding: 5px 14px 5px 10px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+    animation: fadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.1s both;
+  }
+
+  .home-tag-dot {
+    width: 6px; height: 6px;
+    background: #7dd3fc;
     border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 20px;
-    font-size: 24px;
+    box-shadow: 0 0 8px #7dd3fc;
+    animation: pulse-dot 2.2s ease-in-out infinite;
+    flex-shrink: 0;
   }
 
-  .upload-card h2 {
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px #7dd3fc; }
+    50%       { opacity: 0.5; transform: scale(0.65); box-shadow: 0 0 3px #7dd3fc; }
+  }
+
+  /* ── Main title ── */
+  .home-title {
     font-family: 'Lora', serif;
-    font-size: 20px;
+    font-size: clamp(36px, 9vw, 62px);
+    font-weight: 600;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    text-align: center;
+    color: #ffffff;
     margin-bottom: 8px;
+    animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) 0.15s both;
+    text-shadow: 0 2px 40px rgba(0,0,0,0.4);
   }
 
-  .upload-card p { color: var(--text-muted); font-size: 14px; }
+  .home-title-accent {
+    display: block;
+    background: linear-gradient(100deg, #7dd3fc 0%, #a78bfa 40%, #7dd3fc 80%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 5s linear infinite;
+    filter: drop-shadow(0 0 20px rgba(125,211,252,0.3));
+  }
+
+  @keyframes shimmer {
+    0%   { background-position: 0% center; }
+    100% { background-position: 200% center; }
+  }
+
+  /* ── Subtitle ── */
+  .home-sub {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.52);
+    text-align: center;
+    max-width: 300px;
+    line-height: 1.65;
+    margin-bottom: 40px;
+    animation: fadeUp 0.85s cubic-bezier(0.22,1,0.36,1) 0.2s both;
+    letter-spacing: 0.01em;
+  }
+
+  /* ── Glass upload card ── */
+  .upload-card {
+    width: 100%;
+    max-width: 400px;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 24px;
+    padding: 32px 28px 24px;
+    text-align: center;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.05) inset,
+      0 24px 64px rgba(0,0,0,0.35),
+      0 4px 16px rgba(0,0,0,0.2);
+    animation: fadeUp 0.9s cubic-bezier(0.22,1,0.36,1) 0.25s both;
+    transition: box-shadow 0.4s ease, border-color 0.3s;
+    cursor: pointer;
+  }
+
+  .upload-card:hover, .upload-card.drag-over {
+    border-color: rgba(125,211,252,0.4);
+    box-shadow:
+      0 0 0 1px rgba(125,211,252,0.15) inset,
+      0 28px 72px rgba(0,0,0,0.4),
+      0 0 40px rgba(125,211,252,0.08);
+  }
+
+  /* Tooth icon in card */
+  .card-tooth {
+    font-size: 36px;
+    display: block;
+    margin-bottom: 14px;
+    line-height: 1;
+    filter: drop-shadow(0 4px 12px rgba(125,211,252,0.3));
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  .upload-card:hover .card-tooth { transform: scale(1.12) rotate(8deg); }
+
+  .card-title {
+    font-family: 'Lora', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.92);
+    margin-bottom: 6px;
+  }
+
+  .card-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.42);
+    margin-bottom: 22px;
+    line-height: 1.5;
+  }
 
   .upload-btn {
-    display: inline-block;
-    margin-top: 24px;
-    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    width: 100%;
+    background: linear-gradient(135deg, #2d5a8e 0%, #1e3f63 100%);
     color: white;
-    padding: 11px 28px;
-    border-radius: 8px;
+    padding: 15px 28px;
+    border-radius: 14px;
+    font-family: 'Inter', sans-serif;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 15px;
     cursor: pointer;
-    transition: background 0.2s;
     border: none;
+    letter-spacing: 0.01em;
+    box-shadow: 0 4px 20px rgba(45,90,142,0.5), 0 1px 0 rgba(255,255,255,0.15) inset;
+    transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s, background 0.2s;
+    position: relative;
+    overflow: hidden;
   }
 
-  .upload-btn:hover { background: var(--accent-dark); }
+  .upload-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+    border-radius: inherit;
+  }
+
+  .upload-btn:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 8px 28px rgba(45,90,142,0.6), 0 1px 0 rgba(255,255,255,0.15) inset;
+  }
+
+  .upload-btn:active {
+    transform: translateY(1px) scale(0.99);
+    box-shadow: 0 2px 10px rgba(45,90,142,0.4);
+    transition: transform 0.08s, box-shadow 0.08s;
+  }
+
+  .upload-meta {
+    margin-top: 14px;
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.28);
+    letter-spacing: 0.03em;
+  }
 
   #file-input { display: none; }
 
-  .upload-meta {
-    margin-top: 20px;
-    font-size: 12px;
-    color: var(--text-muted);
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
   /* ── EXAM SHELL ── */
   #exam-screen { display: none; min-height: 100vh; }
 
-  /* Header */
+  /* Header — glass */
   .exam-header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
+    background: rgba(13,21,33,0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--glass-border);
     padding: 0 24px;
     height: 60px;
     display: flex; align-items: center; justify-content: space-between;
     position: sticky; top: 0; z-index: 100;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.04), 0 4px 20px rgba(0,0,0,0.3);
   }
 
   .header-title {
     font-family: 'Lora', serif;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.01em;
   }
 
-  .header-right { display: flex; align-items: center; gap: 16px; }
+  .header-right { display: flex; align-items: center; gap: 14px; }
 
-  .progress-text { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+  .progress-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
 
   .finish-btn {
-    background: var(--accent);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
     color: white;
     border: none;
-    padding: 8px 20px;
-    border-radius: 7px;
+    padding: 8px 18px;
+    border-radius: 8px;
     font-weight: 600;
     font-size: 13px;
     cursor: pointer;
-    transition: background 0.2s;
+    box-shadow: 0 2px 12px rgba(74,159,212,0.35);
+    transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
   }
 
-  .finish-btn:hover { background: var(--accent-dark); }
+  .finish-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 18px rgba(74,159,212,0.5);
+  }
+  .finish-btn:active { transform: translateY(1px); }
 
   /* Layout */
   .exam-body {
@@ -346,8 +517,9 @@
 
   /* Sidebar */
   .sidebar {
-    background: var(--surface);
-    border-right: 1px solid var(--border);
+    background: rgba(13,21,33,0.6);
+    backdrop-filter: blur(16px);
+    border-right: 1px solid var(--glass-border);
     padding: 24px 16px;
     position: sticky;
     top: 60px;
@@ -373,22 +545,22 @@
 
   .q-dot {
     aspect-ratio: 1;
-    border-radius: 6px;
-    border: 2px solid var(--unanswered);
-    background: transparent;
+    border-radius: 7px;
+    border: 1.5px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.03);
     font-size: 11px;
     font-weight: 600;
     color: var(--text-muted);
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    transition: all 0.15s;
+    transition: all 0.18s cubic-bezier(0.34,1.4,0.64,1);
   }
 
-  .q-dot:hover { border-color: var(--accent); color: var(--accent); }
-  .q-dot.answered { background: var(--accent); border-color: var(--accent); color: white; }
-  .q-dot.current { outline: 3px solid var(--accent); outline-offset: 2px; }
-  .q-dot.scenario-q { border-color: var(--scenario); }
-  .q-dot.scenario-q.answered { background: var(--scenario); border-color: var(--scenario); }
+  .q-dot:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); transform: perspective(300px) translateZ(5px); }
+  .q-dot.answered { background: var(--accent); border-color: var(--accent); color: white; box-shadow: 0 2px 8px rgba(74,159,212,0.3); }
+  .q-dot.current { outline: 2px solid var(--accent); outline-offset: 2px; box-shadow: 0 0 12px rgba(74,159,212,0.4); }
+  .q-dot.scenario-q { border-color: rgba(155,127,232,0.4); }
+  .q-dot.scenario-q.answered { background: var(--scenario); border-color: var(--scenario); box-shadow: 0 2px 8px rgba(155,127,232,0.3); }
 
   .legend {
     margin-top: 20px;
@@ -417,32 +589,36 @@
 
   /* Scenario box */
   .scenario-box {
-    background: var(--scenario-bg);
-    border-left: 4px solid var(--scenario);
-    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    background: rgba(155,127,232,0.07);
+    border: 1px solid rgba(155,127,232,0.2);
+    border-left: 3px solid var(--scenario);
+    border-radius: var(--radius-sm);
     padding: 20px 24px;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
+    backdrop-filter: blur(8px);
   }
 
   .scenario-label {
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--scenario);
     margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
   }
 
   .scenario-text {
     font-family: 'Lora', serif;
     font-size: 15px;
     line-height: 1.75;
-    color: #2a1f4e;
+    color: rgba(232,220,255,0.9);
   }
 
   /* Question card */
   .question-card {
     background: var(--surface);
+    border: 1px solid var(--glass-border);
     border-radius: var(--radius);
     padding: 28px 32px;
     box-shadow: var(--shadow);
@@ -457,13 +633,14 @@
   .q-number {
     flex-shrink: 0;
     width: 32px; height: 32px;
-    background: var(--accent);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
     color: white;
-    border-radius: 8px;
+    border-radius: 9px;
     display: flex; align-items: center; justify-content: center;
     font-size: 13px;
     font-weight: 700;
     margin-top: 2px;
+    box-shadow: 0 2px 10px rgba(74,159,212,0.4);
   }
 
   .q-number.scenario-num { background: var(--scenario); }
@@ -481,35 +658,47 @@
 
   .option {
     display: flex; align-items: center; gap: 14px;
-    padding: 14px 18px;
-    border-radius: 9px;
-    border: 2px solid var(--border);
+    padding: 13px 18px;
+    border-radius: 11px;
+    border: 1px solid var(--glass-border);
     cursor: pointer;
-    transition: all 0.15s;
-    background: var(--surface);
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    background: rgba(255,255,255,0.03);
   }
 
-  /* option hover/selected handled by 3D block above */
+  .option:hover {
+    border-color: rgba(74,159,212,0.4);
+    background: rgba(74,159,212,0.06);
+  }
+
+  .option.selected {
+    border-color: var(--accent);
+    background: rgba(74,159,212,0.1);
+    box-shadow: 0 0 0 1px rgba(74,159,212,0.3);
+  }
 
   .option-letter {
     width: 28px; height: 28px;
-    border-radius: 6px;
-    border: 2px solid var(--border);
+    border-radius: 7px;
+    border: 1.5px solid rgba(255,255,255,0.12);
     display: flex; align-items: center; justify-content: center;
-    font-size: 12px;
+    font-size: 11px;
+    font-family: 'Inter', sans-serif;
     font-weight: 700;
     flex-shrink: 0;
     transition: all 0.15s;
     color: var(--text-muted);
+    background: rgba(255,255,255,0.03);
   }
 
   .option.selected .option-letter {
     background: var(--accent);
     border-color: var(--accent);
     color: white;
+    box-shadow: 0 2px 8px rgba(74,159,212,0.4);
   }
 
-  .option-text { font-size: 14.5px; line-height: 1.5; }
+  .option-text { font-size: 14.5px; line-height: 1.5; color: var(--text); }
 
   /* Navigation */
   .nav-bar {
@@ -520,21 +709,36 @@
 
   .nav-btn {
     display: flex; align-items: center; gap: 8px;
-    padding: 10px 22px;
-    border-radius: 8px;
-    border: 2px solid var(--border);
-    background: var(--surface);
+    padding: 11px 22px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255,255,255,0.04);
     font-weight: 600;
     font-size: 14px;
     cursor: pointer;
-    transition: all 0.15s;
     color: var(--text);
+    transition: border-color 0.15s, background 0.15s, transform 0.15s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.15s;
   }
 
-  .nav-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
-  .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-  .nav-btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
-  .nav-btn.primary:hover:not(:disabled) { background: var(--accent-dark); border-color: var(--accent-dark); color: white; }
+  .nav-btn:hover:not(:disabled) {
+    border-color: rgba(74,159,212,0.4);
+    color: var(--accent);
+    background: rgba(74,159,212,0.07);
+    transform: perspective(400px) translateZ(5px);
+  }
+  .nav-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+  .nav-btn.primary {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 16px rgba(74,159,212,0.35);
+  }
+  .nav-btn.primary:hover:not(:disabled) {
+    box-shadow: 0 6px 22px rgba(74,159,212,0.5);
+    background: linear-gradient(135deg, #5ab0e4 0%, var(--accent) 100%);
+    border-color: transparent;
+    color: white;
+  }
 
   /* ── RESULTS SCREEN ── */
   #results-screen {
@@ -592,22 +796,22 @@
     font-size: 14px;
   }
 
-  .score-pill.correct { background: var(--correct-bg); color: var(--correct); }
-  .score-pill.wrong { background: var(--wrong-bg); color: var(--wrong); }
-  .score-pill.skipped { background: var(--surface2); color: var(--text-muted); }
+  .score-pill.correct { background: var(--correct-bg); color: var(--correct); border: 1px solid rgba(52,196,122,0.25); }
+  .score-pill.wrong { background: var(--wrong-bg); color: var(--wrong); border: 1px solid rgba(240,96,112,0.25); }
+  .score-pill.skipped { background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid var(--glass-border); }
 
   /* Result items */
   .result-item {
     background: var(--surface);
     border-radius: var(--radius);
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     overflow: hidden;
     box-shadow: var(--shadow);
-    border: 2px solid var(--border);
+    border: 1px solid var(--glass-border);
   }
 
-  .result-item.correct-item { border-color: var(--correct); }
-  .result-item.wrong-item { border-color: var(--wrong); }
+  .result-item.correct-item { border-color: rgba(52,196,122,0.3); }
+  .result-item.wrong-item { border-color: rgba(240,96,112,0.3); }
 
   .result-top {
     display: flex; align-items: flex-start; gap: 14px;
@@ -699,8 +903,9 @@
 
   .result-explanation {
     margin-top: 12px;
-    background: var(--surface2);
-    border-radius: 8px;
+    background: rgba(74,159,212,0.06);
+    border: 1px solid rgba(74,159,212,0.15);
+    border-radius: 10px;
     padding: 14px 16px;
     font-size: 13.5px;
     color: var(--text-muted);
@@ -713,18 +918,24 @@
     display: block;
     width: fit-content;
     margin: 32px auto 0;
-    background: var(--accent);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
     color: white;
     border: none;
-    padding: 13px 36px;
-    border-radius: 9px;
+    padding: 14px 40px;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
     font-weight: 700;
     font-size: 15px;
     cursor: pointer;
-    transition: background 0.2s;
+    box-shadow: 0 4px 20px rgba(74,159,212,0.4);
+    transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
   }
 
-  .restart-btn:hover { background: var(--accent-dark); }
+  .restart-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(74,159,212,0.5);
+  }
+  .restart-btn:active { transform: translateY(1px); }
 
   /* Finish confirm modal */
   .modal-overlay {
@@ -738,8 +949,10 @@
   .modal-overlay.show { display: flex; }
 
   .modal {
-    background: var(--surface);
-    border-radius: var(--radius);
+    background: rgba(19,30,46,0.95);
+    backdrop-filter: blur(24px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
     padding: 32px;
     max-width: 440px;
     width: 90%;
@@ -754,40 +967,46 @@
 
   .modal-cancel {
     padding: 10px 24px;
-    border-radius: 8px;
-    border: 2px solid var(--border);
-    background: var(--surface);
+    border-radius: 9px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
     font-weight: 600; font-size: 14px;
     cursor: pointer; transition: all 0.15s;
   }
 
-  .modal-cancel:hover { border-color: var(--accent); color: var(--accent); }
+  .modal-cancel:hover { border-color: rgba(74,159,212,0.4); color: var(--accent); }
 
   .modal-confirm {
     padding: 10px 24px;
-    border-radius: 8px;
+    border-radius: 9px;
     border: none;
-    background: var(--accent);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
     color: white;
     font-weight: 600; font-size: 14px;
-    cursor: pointer; transition: background 0.15s;
+    cursor: pointer;
+    box-shadow: 0 3px 12px rgba(74,159,212,0.35);
+    transition: box-shadow 0.15s, transform 0.15s;
   }
 
-  .modal-confirm:hover { background: var(--accent-dark); }
+  .modal-confirm:hover { box-shadow: 0 5px 18px rgba(74,159,212,0.5); transform: translateY(-1px); }
 
   /* Toast */
   .toast {
     position: fixed;
     bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: #1a1714;
-    color: white;
+    background: rgba(13,21,33,0.92);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    color: var(--text);
     padding: 10px 22px;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 13px; font-weight: 500;
     z-index: 300;
     opacity: 0;
     transition: opacity 0.3s;
     pointer-events: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
   }
 
   .toast.show { opacity: 1; }
@@ -795,17 +1014,19 @@
   /* ── MOBILE SIDEBAR TOGGLE ── */
   .sidebar-toggle {
     display: none;
-    background: var(--accent-light);
-    border: 2px solid var(--accent);
+    background: rgba(74,159,212,0.1);
+    border: 1px solid rgba(74,159,212,0.3);
     color: var(--accent);
-    border-radius: 7px;
+    border-radius: 8px;
     padding: 6px 12px;
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
     gap: 6px;
     align-items: center;
+    transition: background 0.15s, box-shadow 0.15s;
   }
+  .sidebar-toggle:hover { background: rgba(74,159,212,0.18); box-shadow: 0 0 12px rgba(74,159,212,0.2); }
 
   .sidebar-drawer {
     display: contents;
@@ -840,6 +1061,8 @@
 
     .sidebar.open {
       transform: translateY(0);
+      background: rgba(13,21,33,0.97);
+      backdrop-filter: blur(24px);
     }
 
     /* question area full width */
@@ -878,30 +1101,74 @@
     .scenario-text { font-size: 14px; }
 
     /* upload screen */
-    .upload-card { padding: 32px 20px; }
-    .brand h1 { font-size: 26px; }
+    .upload-card { padding: 24px 20px; }
+    .home-title { font-size: 36px; }
+    .home-sub { font-size: 13px; }
   }
 </style>
 </head>
 <body>
 
 <canvas id="three-canvas"></canvas>
+<script>document.body.classList.add("on-upload");</script>
 <!-- ── UPLOAD SCREEN ── -->
 <div id="upload-screen">
-  <div class="brand">
-    <div class="brand-badge">ADC Written Exam</div>
-    <h1>MCQ Practice Platform</h1>
-    <p>Upload your weekly question JSON to begin a timed, scenario-aware practice session.</p>
-  </div>
+  <div class="home-inner">
 
-  <div class="upload-card" id="drop-zone">
-    <div class="upload-icon">📄</div>
-    <h2>Upload Question File</h2>
-    <p>Drag & drop your JSON file here, or click the button below</p>
-    <button class="upload-btn" id="upload-btn">Choose File</button>
-    <p class="upload-meta">Accepts .json files only</p>
-  </div>
+    <!-- Floating tooth -->
+    <svg class="tooth-icon" viewBox="0 0 80 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="tg" x1="0" y1="0" x2="80" y2="90" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#e8f4ff"/>
+          <stop offset="50%" stop-color="#c8dff5"/>
+          <stop offset="100%" stop-color="#a0c4e8"/>
+        </linearGradient>
+        <linearGradient id="sg" x1="0" y1="0" x2="30" y2="40" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="rgba(255,255,255,0.8)"/>
+          <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <!-- Main tooth body -->
+      <path d="M15 22 C10 10 5 4 20 2 C28 1 34 6 40 6 C46 6 52 1 60 2 C75 4 70 10 65 22 C62 30 60 38 58 50 C56 62 54 78 50 82 C47 86 44 88 40 88 C36 88 33 86 30 82 C26 78 24 62 22 50 C20 38 18 30 15 22Z" fill="url(#tg)" filter="url(#glow)" stroke="rgba(255,255,255,0.4)" stroke-width="0.5"/>
+      <!-- Highlight -->
+      <path d="M22 12 C19 8 18 5 26 4 C31 3.5 36 7 38 8" stroke="url(#sg)" stroke-width="3" stroke-linecap="round" fill="none"/>
+      <!-- Root split -->
+      <path d="M34 68 C32 72 30 80 28 84" stroke="rgba(160,196,232,0.6)" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <path d="M46 68 C48 72 50 80 52 84" stroke="rgba(160,196,232,0.6)" stroke-width="2" stroke-linecap="round" fill="none"/>
+    </svg>
 
+    <!-- Tag -->
+    <div class="home-tag">
+      <span class="home-tag-dot"></span>
+      ADC Written Examination
+    </div>
+
+    <!-- Title -->
+    <h1 class="home-title">
+      Master Your
+      <span class="home-title-accent">ADC Practice</span>
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="home-sub">Scenario-based MCQs designed to prepare you for the written exam. Load your weekly set and begin.</p>
+
+    <!-- Upload card -->
+    <div class="upload-card" id="drop-zone">
+      <span class="card-tooth">🦷</span>
+      <div class="card-title">Load Question Set</div>
+      <div class="card-sub">Tap to select your JSON file</div>
+      <button class="upload-btn" id="upload-btn">
+        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+        Begin Practice
+      </button>
+      <div class="upload-meta">JSON · weekly question sets</div>
+    </div>
+
+  </div>
   <input type="file" id="file-input" accept=".json">
 </div>
 
@@ -1013,6 +1280,11 @@ const fileInput = document.getElementById('file-input');
 const uploadBtn = document.getElementById('upload-btn');
 
 uploadBtn.addEventListener('click', (e) => { e.stopPropagation(); fileInput.click(); });
+// On mobile the whole card is tappable too
+dropZone.addEventListener('click', (e) => {
+  if (e.target === uploadBtn || uploadBtn.contains(e.target)) return;
+  fileInput.click();
+});
 dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
 dropZone.addEventListener('drop', e => {
@@ -1048,6 +1320,7 @@ function initExam(data) {
 
   document.getElementById('exam-title').textContent = data.exam_title || 'ADC Practice Exam';
   document.getElementById('upload-screen').style.display = 'none';
+  document.body.classList.remove('on-upload');
   document.getElementById('exam-screen').style.display = 'block';
   buildGrid();
   renderQuestion(0);
@@ -1266,6 +1539,7 @@ function resetApp() {
   examData = null; questions = []; answers = {}; currentIndex = 0;
   document.getElementById('results-screen').style.display = 'none';
   document.getElementById('upload-screen').style.display = 'flex';
+  document.body.classList.add('on-upload');
   fileInput.value = '';
   // reset arc
   document.getElementById('score-arc').style.transition = 'none';
@@ -1305,6 +1579,7 @@ function showToast(msg) {
   if (!canvas || typeof THREE === 'undefined') return;
 
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setClearColor(0x0a1628, 0);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -1313,11 +1588,11 @@ function showToast(msg) {
   camera.position.z = 18;
 
   // Warm neutral lights
-  scene.add(new THREE.AmbientLight(0xf5f0e8, 0.5));
-  const key = new THREE.PointLight(0xf0ece4, 3.0, 80);
+  scene.add(new THREE.AmbientLight(0x0a1628, 0.3));
+  const key = new THREE.PointLight(0x4a8fd4, 3.0, 80);
   key.position.set(8, 8, 12);
   scene.add(key);
-  const fill = new THREE.PointLight(0xe8e0d4, 1.6, 60);
+  const fill = new THREE.PointLight(0x7a4aaa, 1.6, 60);
   fill.position.set(-8, -4, 8);
   scene.add(fill);
 
@@ -1329,8 +1604,8 @@ function showToast(msg) {
 
   for (let i = 0; i < 22; i++) {
     const shade = Math.random() < 0.5
-      ? new THREE.MeshPhongMaterial({ color: 0x1a1714, emissive: 0x080706, shininess: 120, specular: 0xf0ece4, transparent: true, opacity: 0.55 + Math.random() * 0.2 })
-      : new THREE.MeshPhongMaterial({ color: 0x3a3530, emissive: 0x181410, shininess: 90,  specular: 0xf0ece4, transparent: true, opacity: 0.4  + Math.random() * 0.2 });
+      ? new THREE.MeshPhongMaterial({ color: 0x1a2a44, emissive: 0x060e1a, shininess: 140, specular: 0x4a8fd4, transparent: true, opacity: 0.45 + Math.random() * 0.25 })
+      : new THREE.MeshPhongMaterial({ color: 0x0d1a30, emissive: 0x040a14, shininess: 100, specular: 0x7a4aaa, transparent: true, opacity: 0.35 + Math.random() * 0.2 });
 
     const mesh = new THREE.Mesh(geo, shade);
     mesh.position.set(
